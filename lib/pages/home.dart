@@ -1,8 +1,8 @@
+import 'package:chitisplit/pages/add-person-to-group.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:chitisplit/classes/group.dart';
-
 
 class Home extends StatefulWidget {
   @override
@@ -26,7 +26,7 @@ class _HomeState extends State<Home> {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               GroupOverview(),
-              Menu(),
+              Menu(setParentState: this.setState),
             ],
           ),
         ),
@@ -70,8 +70,9 @@ List<DataRow> buildRows() {
   return rows;
 }
 
-
 class Menu extends StatelessWidget {
+  final void Function(void Function()) setParentState;
+  Menu({this.setParentState});
   @override
   Widget build(BuildContext context) {
     return Column(children: [
@@ -101,6 +102,13 @@ class Menu extends StatelessWidget {
           leading: Icon(Icons.person_add),
           trailing: Icon(Icons.play_arrow),
           title: Text('Add person to group', textAlign: TextAlign.center),
+          onTap: () {
+            //Navigator.pushNamed(context, '/add-person-to-group');
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => AddPersonToGroup()),
+            ).then((value) => setParentState(() {}));
+          },
         ),
       ),
     ]);

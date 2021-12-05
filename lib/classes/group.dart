@@ -19,6 +19,9 @@ class Group {
   }
 
   addMember(String name) {
+    if (name == "") {
+      throw new ArgumentError("user name cannot be empty");
+    }
     if (this.isMember(name)) {
       throw new ArgumentError("user already member of the group");
     }
