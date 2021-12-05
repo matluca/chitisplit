@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
+import 'package:chitisplit/classes/group.dart';
 
 
 class Home extends StatefulWidget {
@@ -24,14 +25,7 @@ class _HomeState extends State<Home> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              SizedBox(
-                  height: 300,
-                  width: 300,
-                  child: Text(
-                    'Overview',
-                    style: TextStyle(fontSize: 20),
-                    textAlign: TextAlign.center,
-                  )),
+              GroupOverview(),
               Menu(),
             ],
           ),
@@ -40,6 +34,42 @@ class _HomeState extends State<Home> {
     );
   }
 }
+
+class GroupOverview extends StatefulWidget {
+  @override
+  _GroupOverviewState createState() => _GroupOverviewState();
+}
+
+class _GroupOverviewState extends State<GroupOverview> {
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Text("Overview"),
+        DataTable(
+          columns: [
+            DataColumn(label: Text("Name")),
+            DataColumn(label: Text("Fuffa")),
+          ],
+          rows: buildRows(),
+        ),
+      ],
+    );
+  }
+}
+
+List<DataRow> buildRows() {
+  List<DataRow> rows = [];
+  for (var p in group.members) {
+    DataRow row = new DataRow(cells: [
+      DataCell(Text(p)),
+      DataCell(Text("fuffa")),
+    ]);
+    rows.add(row);
+  }
+  return rows;
+}
+
 
 class Menu extends StatelessWidget {
   @override
