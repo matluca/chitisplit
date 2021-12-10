@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:chitisplit/classes/group.dart';
 
 class AddPersonToGroup extends StatefulWidget {
@@ -16,7 +15,7 @@ class _AddPersonToGroupState extends State<AddPersonToGroup> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Add Person To Group'),
+        title: Text('Add person to group'),
         centerTitle: true,
         actions: <Widget>[
           IconButton(

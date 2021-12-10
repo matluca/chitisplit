@@ -1,4 +1,5 @@
 import 'package:chitisplit/pages/add-person-to-group.dart';
+import 'package:chitisplit/pages/settings.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
@@ -16,6 +17,17 @@ class _HomeState extends State<Home> {
       appBar: AppBar(
         title: Text('Chi Ti Split'),
         centerTitle: true,
+        actions: <Widget>[
+          IconButton(
+            icon: Icon(Icons.settings, color: Colors.white),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => Settings(currentGroup: group)),
+              ).then((value) => setState(() {}));
+            },
+          ),
+        ],
       ),
       backgroundColor: Colors.blueAccent,
       body: SingleChildScrollView(
@@ -45,7 +57,7 @@ class _GroupOverviewState extends State<GroupOverview> {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        Text("Overview"),
+        Text("Overview - ${group.currentUser}", style: TextStyle(fontSize: 25)),
         DataTable(
           columns: [
             DataColumn(label: Text("Name")),

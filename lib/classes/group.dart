@@ -5,14 +5,15 @@ enum TransactionType {
   transfer,
 }
 
-Group group = Group(name: "Gruppo bellissimo", members: <String>["name1", "name2"]);
+Group group = Group(name: "Gruppo bellissimo", members: <String>["Federico", "Luca", "Stfnzblnnnnnnnnnn"], currentUser: "Federico");
 
 class Group {
   String name;
+  String currentUser;
   List<String> members;
   List<Transaction> transactions;
 
-  Group({this.name, this.members});
+  Group({this.name, this.members, this.currentUser});
 
   bool isMember(String name) {
     return this.members.contains(name);
