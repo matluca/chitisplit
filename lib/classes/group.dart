@@ -22,7 +22,7 @@ class Group {
   }
 
   addMember(String name) {
-    if (name == "") {
+    if (name.isEmpty) {
       throw new ArgumentError("user name cannot be empty");
     }
     if (this.isMember(name)) {
@@ -60,7 +60,7 @@ class Group {
   }
   
   addTransfer(String name, DateTime date, String payer, String receiver, int amount) {
-    if (name == "") {
+    if (name.isEmpty) {
       name = "Transfer " + payer + "->" + receiver;
     }
     Map<String, int> shares = new Map();

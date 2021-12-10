@@ -3,6 +3,8 @@ import 'package:flutter/rendering.dart';
 import 'package:chitisplit/classes/group.dart';
 
 class AddPersonToGroup extends StatefulWidget {
+  final Group currentGroup;
+  AddPersonToGroup({this.currentGroup});
   @override
   _AddPersonToGroupState createState() => _AddPersonToGroupState();
 }
@@ -55,7 +57,7 @@ class _AddPersonToGroupState extends State<AddPersonToGroup> {
               ),
               onPressed: () {
                 try {
-                  group.addMember(_nameController.text);
+                  widget.currentGroup.addMember(_nameController.text);
                   setState(() {
                     _userError = null;
                   });

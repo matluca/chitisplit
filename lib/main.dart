@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:chitisplit/pages/home.dart';
 import 'package:chitisplit/pages/add-person-to-group.dart';
 import 'package:chitisplit/pages/settings.dart';
+import 'package:chitisplit/pages/add-expense.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -25,6 +26,7 @@ class AppChiTiSplit extends StatelessWidget {
         '/': (context) => Home(),
         '/add-person-to-group': (context) => AddPersonToGroup(),
         '/settings': (context) => Settings(),
+        '/add-expense': (context) => AddExpense(),
       },
     );
   }
