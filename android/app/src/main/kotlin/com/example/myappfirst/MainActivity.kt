@@ -1,4 +1,4 @@
-package com.example.myappfirst
+package com.example.chitisplit
 
 import io.flutter.embedding.android.FlutterActivity
 

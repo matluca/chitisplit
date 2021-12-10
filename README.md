@@ -1,4 +1,4 @@
-# myappfirst
+# chitisplit
 
 A new Flutter application.
 
