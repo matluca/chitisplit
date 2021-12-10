@@ -13,7 +13,9 @@ class Group {
   List<String> members;
   List<Transaction> transactions;
 
-  Group({this.name, this.members, this.currentUser});
+  Group({this.name, this.members, this.currentUser}) {
+    transactions = [];
+  }
 
   bool isMember(String name) {
     return this.members.contains(name);

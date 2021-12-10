@@ -23,7 +23,8 @@ class _HomeState extends State<Home> {
             onPressed: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => Settings(currentGroup: group)),
+                MaterialPageRoute(
+                    builder: (context) => Settings(currentGroup: group)),
               ).then((value) => setState(() {}));
             },
           ),
@@ -37,7 +38,8 @@ class _HomeState extends State<Home> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              GroupOverview(),
+              GroupOverview(currentGroup: group),
+              SizedBox(height: 20),
               Menu(setParentState: this.setState),
             ],
           ),
@@ -48,6 +50,10 @@ class _HomeState extends State<Home> {
 }
 
 class GroupOverview extends StatefulWidget {
+  final Group currentGroup;
+
+  GroupOverview({this.currentGroup});
+
   @override
   _GroupOverviewState createState() => _GroupOverviewState();
 }
@@ -59,32 +65,40 @@ class _GroupOverviewState extends State<GroupOverview> {
       children: [
         Text("Overview - ${group.currentUser}", style: TextStyle(fontSize: 25)),
         DataTable(
+          headingRowHeight: 15,
           columns: [
-            DataColumn(label: Text("Name")),
-            DataColumn(label: Text("Fuffa")),
+            DataColumn(label: Container()),
+            DataColumn(label: Container()),
           ],
-          rows: buildRows(),
+          rows: [
+            DataRow(cells: [
+              DataCell(Text("This event cost the group:")),
+              DataCell(Text("€${widget.currentGroup.totalGroupExpenses()}")),
+            ]),
+            DataRow(cells: [
+              DataCell(Text("It cost you:")),
+              DataCell(Text("€${widget.currentGroup.totalExpenses(widget.currentGroup.currentUser)}")),
+            ]),
+            DataRow(cells: [
+              DataCell(Text("You have paid:")),
+              DataCell(Text("€${widget.currentGroup.totalPayments(widget.currentGroup.currentUser)}")),
+            ]),
+            DataRow(cells: [
+              DataCell(Text("You owe:")),
+              DataCell(Text("€${widget.currentGroup.personalBalance(widget.currentGroup.currentUser)}")),
+            ]),
+          ],
         ),
       ],
     );
   }
 }
 
-List<DataRow> buildRows() {
-  List<DataRow> rows = [];
-  for (var p in group.members) {
-    DataRow row = new DataRow(cells: [
-      DataCell(Text(p)),
-      DataCell(Text("fuffa")),
-    ]);
-    rows.add(row);
-  }
-  return rows;
-}
-
 class Menu extends StatelessWidget {
   final void Function(void Function()) setParentState;
+
   Menu({this.setParentState});
+
   @override
   Widget build(BuildContext context) {
     return Column(children: [
