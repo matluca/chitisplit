@@ -1,4 +1,5 @@
 import 'package:chitisplit/pages/add-expense.dart';
+import 'package:chitisplit/pages/add-transfer.dart';
 import 'package:chitisplit/pages/add-person-to-group.dart';
 import 'package:chitisplit/pages/settings.dart';
 import 'package:flutter/material.dart';
@@ -129,11 +130,17 @@ class Menu extends StatelessWidget {
           },
         ),
       ),
-      const Card(
+      Card(
         child: ListTile(
-          leading: Icon(MdiIcons.cashRefund),
-          trailing: Icon(Icons.play_arrow),
-          title: Text('Transfer', textAlign: TextAlign.center),
+          leading: const Icon(MdiIcons.cashRefund),
+          trailing: const Icon(Icons.play_arrow),
+          title: const Text('Transfer', textAlign: TextAlign.center),
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => AddTransfer(currentGroup)),
+            ).then((value) => setParentState(() {}));
+          },
         ),
       ),
       const Card(
