@@ -4,21 +4,19 @@ import 'package:flutter/services.dart';
 
 class AddExpense extends StatefulWidget {
   final Group currentGroup;
-  String payer;
+  String? payer;
 
-  AddExpense({this.currentGroup}) {
-    payer = this.currentGroup.currentUser;
-  }
+  AddExpense(this.currentGroup) : payer = currentGroup.currentUser;
 
   @override
   _AddExpenseState createState() => _AddExpenseState();
 }
 
 class _AddExpenseState extends State<AddExpense> {
-  String _name;
-  DateTime _date;
-  int _amount;
-  Map<String, int> _shares;
+  String _name = "";
+  DateTime _date = DateTime.now();
+  int _amount = 0;
+  Map<String, int> _shares = {};
 
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
@@ -31,7 +29,7 @@ class _AddExpenseState extends State<AddExpense> {
         height: 2,
         color: Colors.black54,
       ),
-      onChanged: (String newValue) {
+      onChanged: (String? newValue) {
         widget.payer = newValue;
         setState(() {});
         print(widget.payer);
@@ -55,11 +53,11 @@ class _AddExpenseState extends State<AddExpense> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Add expense'),
+        title: const Text('Add expense'),
         centerTitle: true,
         actions: <Widget>[
           IconButton(
-            icon: Icon(Icons.home, color: Colors.white),
+            icon: const Icon(Icons.home, color: Colors.white),
             onPressed: () {
               Navigator.popUntil(context, ModalRoute.withName('/'));
             },
@@ -79,16 +77,19 @@ class _AddExpenseState extends State<AddExpense> {
                   builder: (FormFieldState<dynamic> state) {
                     return _buildSelectPayer();
                   },
-                  onSaved: (String value) {},
+                  onSaved: (String? value) {},
                 ),
                 TextFormField(
-                  decoration: InputDecoration(labelText: "Amount"),
+                  decoration: const InputDecoration(labelText: "Amount"),
                   keyboardType: TextInputType.number,
                   inputFormatters: <TextInputFormatter>[
-                    WhitelistingTextInputFormatter.digitsOnly
+                    FilteringTextInputFormatter.digitsOnly
                   ],
-                  validator: (String value) {
-                    int amount = int.tryParse(value);
+                  validator: (String? value) {
+                    if (value == null) {
+                      return "Invalid amount";
+                    }
+                    int? amount = int.tryParse(value);
                     if (amount == null) {
                       return "Invalid amount";
                     }
@@ -97,15 +98,15 @@ class _AddExpenseState extends State<AddExpense> {
                     }
                     return null;
                   },
-                  onSaved: (String value) {
-                    _amount = int.parse(value);
+                  onSaved: (String? value) {
+                    _amount = int.parse(value as String);
                   },
                 ),
                 TextFormField(
-                  decoration: InputDecoration(labelText: "Description"),
+                  decoration: const InputDecoration(labelText: "Description"),
                   maxLength: 25,
-                  onSaved: (String value) {
-                    _name = value;
+                  onSaved: (String? value) {
+                    _name = value ??= "";
                   },
                 ),
                 // TextFormField(
@@ -115,22 +116,22 @@ class _AddExpenseState extends State<AddExpense> {
                 //     _date = DateTime.parse(value);
                 //   },
                 // ),
-                SizedBox(height: 10),
-                RaisedButton(
-                  color: Colors.cyan,
-                  child: Text(
+                const SizedBox(height: 10),
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(primary: Colors.purple),
+                  child: const Text(
                     'Confirm',
                     style: TextStyle(color: Colors.white),
                   ),
                   onPressed: () {
-                    if (!_formKey.currentState.validate()) {
+                    if (!(_formKey.currentState!).validate()) {
                       print("error");
                       return;
                     }
                     print("success");
                     print("payer is ${widget.payer}");
 
-                    _formKey.currentState.save();
+                    (_formKey.currentState!).save();
                   },
                 ),
               ],

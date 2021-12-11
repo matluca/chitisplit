@@ -3,7 +3,7 @@ import 'package:chitisplit/classes/group.dart';
 
 class Settings extends StatefulWidget {
   final Group currentGroup;
-  Settings({this.currentGroup});
+  const Settings(this.currentGroup);
   @override
   _SettingsState createState() => _SettingsState();
 }
@@ -13,11 +13,11 @@ class _SettingsState extends State<Settings> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Change group settings'),
+        title: const Text('Change group settings'),
         centerTitle: true,
         actions: <Widget>[
           IconButton(
-            icon: Icon(Icons.home, color: Colors.white),
+            icon: const Icon(Icons.home, color: Colors.white),
             onPressed: () {
               Navigator.popUntil(context, ModalRoute.withName('/'));
             },
@@ -32,8 +32,8 @@ class _SettingsState extends State<Settings> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text('Current user', style: TextStyle(fontSize: 20, color: Colors.black54)),
-                SizedBox(width: 15),
+                const Text('Current user', style: TextStyle(fontSize: 20, color: Colors.black54)),
+                const SizedBox(width: 15),
                 DropdownButton<String>(
                   value: widget.currentGroup.currentUser,
                   elevation: 16,
@@ -42,9 +42,9 @@ class _SettingsState extends State<Settings> {
                     height: 2,
                     color: Colors.black54,
                   ),
-                  onChanged: (String newValue) {
+                  onChanged: (String? newValue) {
                     setState(() {
-                      widget.currentGroup.currentUser = newValue;
+                      widget.currentGroup.currentUser = newValue ??= widget.currentGroup.currentUser;
                     });
                   },
                   items: widget.currentGroup.members.map<DropdownMenuItem<String>>((String value) {

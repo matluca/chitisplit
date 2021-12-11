@@ -5,7 +5,7 @@ enum TransactionType {
   transfer,
 }
 
-Group group = Group(name: "Gruppo bellissimo", members: <String>["Federico", "Luca", "Stfnzblnnnnnnnnnn"], currentUser: "Federico");
+Group group = Group("Gruppo bellissimo", ["Federico", "Luca", "Stfnzblnnnnnnnnnn"], "Federico");
 
 class Group {
   String name;
@@ -13,44 +13,42 @@ class Group {
   List<String> members;
   List<Transaction> transactions;
 
-  Group({this.name, this.members, this.currentUser}) {
-    transactions = [];
-  }
+  Group(this.name, this.members, this.currentUser): transactions=[];
 
   bool isMember(String name) {
-    return this.members.contains(name);
+    return members.contains(name);
   }
 
   addMember(String name) {
     if (name.isEmpty) {
-      throw new ArgumentError("user name cannot be empty");
+      throw ArgumentError("user name cannot be empty");
     }
-    if (this.isMember(name)) {
-      throw new ArgumentError("user already member of the group");
+    if (isMember(name)) {
+      throw ArgumentError("user already member of the group");
     }
-    this.members.add(name);
+    members.add(name);
   }
 
   addTransaction(String name, DateTime date, String payer, int amount, Map<String, int> shares, TransactionType type) {
-    if (!this.isMember(payer)) {
-      throw new ArgumentError(payer + " not member of the group");
+    if (!isMember(payer)) {
+      throw ArgumentError(payer + " not member of the group");
     }
     for (var entry in shares.entries) {
-      if (!this.isMember(entry.key)) {
-        throw new ArgumentError(entry.key + " not member of the group");
+      if (!isMember(entry.key)) {
+        throw ArgumentError(entry.key + " not member of the group");
       }
       if (entry.value < 0) {
-        throw new ArgumentError("negative share not allowed");
+        throw ArgumentError("negative share not allowed");
       }
     }
-    Transaction trans = new Transaction(name: name, date: date, payer: payer, amount: amount, type: type);
-    trans.shares = new Map();
-    int sumShares;
+    Transaction trans = Transaction(name, date, payer, amount, type);
+    trans.shares = <String, Fraction>{};
+    int sumShares = 0;
     for (var v in shares.values) {
       sumShares = sumShares + v;
     }
     for (var share in shares.entries) {
-      Fraction fraction = new Fraction(share.value, sumShares);
+      Fraction fraction = Fraction(share.value, sumShares);
       trans.shares[share.key] = fraction;
     }
   }
@@ -58,12 +56,12 @@ class Group {
   addExpense(String name, DateTime date, String payer, int amount, Map<String, int> shares) {
     addTransaction(name, date, payer, amount, shares, TransactionType.expense);
   }
-  
+
   addTransfer(String name, DateTime date, String payer, String receiver, int amount) {
     if (name.isEmpty) {
       name = "Transfer " + payer + "->" + receiver;
     }
-    Map<String, int> shares = new Map();
+    Map<String, int> shares = <String, int>{};
     shares[receiver] = 1;
     shares[payer] = 0;
     addTransaction(name, date, payer, amount, shares, TransactionType.transfer);
@@ -93,7 +91,7 @@ class Group {
     Fraction tot = 0.toFraction();
     for (var trans in transactions) {
       if ((trans.type == TransactionType.expense) && (trans.shares.containsKey(name))) {
-        tot = tot + trans.amount.toFraction()*trans.shares[name];
+        tot = tot + trans.amount.toFraction()*(trans.shares[name] as Fraction);
       }
     }
     return tot.toDouble().toInt();
@@ -106,7 +104,7 @@ class Group {
         tot = tot + trans.amount.toFraction();
       }
       if (trans.shares.containsKey(name)) {
-        tot = tot - trans.amount.toFraction()*trans.shares[name];
+        tot = tot - trans.amount.toFraction()*(trans.shares[name] as Fraction);
       }
     }
     return tot.toDouble().toInt();
@@ -121,5 +119,5 @@ class Transaction {
   Map<String, Fraction> shares;
   TransactionType type;
 
-  Transaction({this.name, this.date, this.payer, this.amount, this.type});
+  Transaction(this.name, this.date, this.payer, this.amount, this.type): shares=<String, Fraction>{};
 }

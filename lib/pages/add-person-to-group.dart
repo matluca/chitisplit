@@ -1,27 +1,27 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:chitisplit/classes/group.dart';
 
+@immutable
 class AddPersonToGroup extends StatefulWidget {
   final Group currentGroup;
-  AddPersonToGroup({this.currentGroup});
+  const AddPersonToGroup(this.currentGroup);
   @override
   _AddPersonToGroupState createState() => _AddPersonToGroupState();
 }
 
 class _AddPersonToGroupState extends State<AddPersonToGroup> {
-  TextEditingController _nameController = TextEditingController();
-  String _userError;
+  final TextEditingController _nameController = TextEditingController();
+  String? _userError;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Add person to group'),
+        title: const Text('Add person to group'),
         centerTitle: true,
         actions: <Widget>[
           IconButton(
-            icon: Icon(Icons.home, color: Colors.white),
+            icon: const Icon(Icons.home, color: Colors.white),
             onPressed: () {
               Navigator.popUntil(context, ModalRoute.withName('/'));
             },
@@ -33,11 +33,11 @@ class _AddPersonToGroupState extends State<AddPersonToGroup> {
         padding: const EdgeInsets.symmetric(vertical: 30, horizontal: 10),
         child: Column(
           children: [
-            Text(
+            const Text(
               "Insert new user name",
               style: TextStyle(fontSize: 17),
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             TextField(
               controller: _nameController,
               decoration: InputDecoration(
@@ -48,10 +48,10 @@ class _AddPersonToGroupState extends State<AddPersonToGroup> {
                 errorText: _userError,
               ),
             ),
-            SizedBox(height: 20),
-            RaisedButton(
-              color: Colors.cyan,
-              child: Text(
+            const SizedBox(height: 20),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(primary: Colors.purple),
+              child: const Text(
                 'Add and return to home',
                 style: TextStyle(color: Colors.white),
               ),

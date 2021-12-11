@@ -1,32 +1,28 @@
 import 'package:flutter/material.dart';
 import 'package:chitisplit/pages/home.dart';
-import 'package:chitisplit/pages/add-person-to-group.dart';
-import 'package:chitisplit/pages/settings.dart';
-import 'package:chitisplit/pages/add-expense.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
-  runApp(App());
+  runApp(const App());
 }
 
 class App extends StatelessWidget {
+  const App({Key? key}) : super(key: key);
   @override
   Widget build(BuildContext context) {
-    return AppChiTiSplit();
+    return const AppChiTiSplit();
   }
 }
 
 class AppChiTiSplit extends StatelessWidget {
+  const AppChiTiSplit({Key? key}) : super(key: key);
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       initialRoute: "/",
       routes: {
-        '/': (context) => Home(),
-        '/add-person-to-group': (context) => AddPersonToGroup(),
-        '/settings': (context) => Settings(),
-        '/add-expense': (context) => AddExpense(),
+        '/': (context) => const Home(),
       },
     );
   }
