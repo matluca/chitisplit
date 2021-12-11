@@ -29,7 +29,8 @@ class Group {
     members.add(name);
   }
 
-  addTransaction(String name, DateTime date, String payer, int amount, Map<String, int> shares, TransactionType type) {
+  addTransaction(String name, DateTime date, String payer, double amount, Map<String, int> shares, TransactionType type) {
+    int finalAmount = (amount*100).toInt();
     if (!isMember(payer)) {
       throw ArgumentError(payer + " not member of the group");
     }
@@ -41,7 +42,7 @@ class Group {
         throw ArgumentError("negative share not allowed");
       }
     }
-    Transaction trans = Transaction(name, date, payer, amount, type);
+    Transaction trans = Transaction(name, date, payer, finalAmount, type);
     trans.shares = <String, Fraction>{};
     int sumShares = 0;
     for (var v in shares.values) {
@@ -51,13 +52,14 @@ class Group {
       Fraction fraction = Fraction(share.value, sumShares);
       trans.shares[share.key] = fraction;
     }
+    transactions.add(trans);
   }
 
-  addExpense(String name, DateTime date, String payer, int amount, Map<String, int> shares) {
+  addExpense(String name, DateTime date, String payer, double amount, Map<String, int> shares) {
     addTransaction(name, date, payer, amount, shares, TransactionType.expense);
   }
 
-  addTransfer(String name, DateTime date, String payer, String receiver, int amount) {
+  addTransfer(String name, DateTime date, String payer, String receiver, double amount) {
     if (name.isEmpty) {
       name = "Transfer " + payer + "->" + receiver;
     }
@@ -67,37 +69,37 @@ class Group {
     addTransaction(name, date, payer, amount, shares, TransactionType.transfer);
   }
 
-  int totalGroupExpenses() {
+  double totalGroupExpenses() {
     int tot = 0;
     for (var trans in transactions) {
       if (trans.type == TransactionType.expense) {
         tot = tot + trans.amount;
       }
     }
-    return tot;
+    return tot/100;
   }
 
-  int totalPayments(String name) {
+  double totalPayments(String name) {
     int tot = 0;
     for (var trans in transactions) {
       if ((trans.type == TransactionType.expense) && (trans.payer == name)) {
         tot = tot + trans.amount;
       }
     }
-    return tot;
+    return tot/100;
   }
 
-  int totalExpenses(String name) {
+  double totalExpenses(String name) {
     Fraction tot = 0.toFraction();
     for (var trans in transactions) {
       if ((trans.type == TransactionType.expense) && (trans.shares.containsKey(name))) {
         tot = tot + trans.amount.toFraction()*(trans.shares[name] as Fraction);
       }
     }
-    return tot.toDouble().toInt();
+    return tot.toDouble().toInt()/100;
   }
 
-  int personalBalance(String name) {
+  double personalBalance(String name) {
     Fraction tot = 0.toFraction();
     for (var trans in transactions) {
       if (trans.payer == name) {
@@ -107,7 +109,7 @@ class Group {
         tot = tot - trans.amount.toFraction()*(trans.shares[name] as Fraction);
       }
     }
-    return tot.toDouble().toInt();
+    return tot.toDouble().toInt()/100;
   }
 }
 

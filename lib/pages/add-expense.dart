@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:chitisplit/classes/group.dart';
 import 'package:flutter/services.dart';
+import 'package:currency_text_input_formatter/currency_text_input_formatter.dart';
 
 class AddExpense extends StatefulWidget {
   final Group currentGroup;
-  String? payer;
+  String payer;
 
   AddExpense(this.currentGroup) : payer = currentGroup.currentUser;
 
@@ -15,10 +16,13 @@ class AddExpense extends StatefulWidget {
 class _AddExpenseState extends State<AddExpense> {
   String _name = "";
   DateTime _date = DateTime.now();
-  int _amount = 0;
+  double _amount = 0;
   Map<String, int> _shares = {};
 
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  final CurrencyTextInputFormatter _formatter = CurrencyTextInputFormatter(
+    symbol: '€ ',
+  );
 
   Widget _buildSelectPayer() {
     return DropdownButton<String>(
@@ -30,9 +34,8 @@ class _AddExpenseState extends State<AddExpense> {
         color: Colors.black54,
       ),
       onChanged: (String? newValue) {
-        widget.payer = newValue;
+        widget.payer = newValue ??= widget.currentGroup.currentUser;
         setState(() {});
-        print(widget.payer);
       },
       items: widget.currentGroup.members
           .map<DropdownMenuItem<String>>((String value) {
@@ -47,6 +50,22 @@ class _AddExpenseState extends State<AddExpense> {
         );
       }).toList(),
     );
+  }
+
+  Future pickDate(BuildContext context) async {
+    final initialDate = _date;
+    final newDate = await showDatePicker(
+        context: context,
+        initialDate: initialDate,
+        firstDate: DateTime(DateTime.now().year - 5),
+        lastDate: DateTime(DateTime.now().year + 5),
+    );
+    if (newDate == null) {
+      return;
+    }
+    setState(() {
+      _date = newDate;
+    });
   }
 
   @override
@@ -82,24 +101,16 @@ class _AddExpenseState extends State<AddExpense> {
                 TextFormField(
                   decoration: const InputDecoration(labelText: "Amount"),
                   keyboardType: TextInputType.number,
-                  inputFormatters: <TextInputFormatter>[
-                    FilteringTextInputFormatter.digitsOnly
-                  ],
-                  validator: (String? value) {
-                    if (value == null) {
-                      return "Invalid amount";
-                    }
-                    int? amount = int.tryParse(value);
-                    if (amount == null) {
-                      return "Invalid amount";
-                    }
+                  inputFormatters: <TextInputFormatter>[_formatter],
+                  validator: (String? v) {
+                    double amount = _formatter.getUnformattedValue().toDouble();
                     if (amount <= 0) {
                       return "Amount should be positive";
                     }
                     return null;
                   },
                   onSaved: (String? value) {
-                    _amount = int.parse(value as String);
+                    _amount = _formatter.getUnformattedValue().toDouble();
                   },
                 ),
                 TextFormField(
@@ -109,29 +120,28 @@ class _AddExpenseState extends State<AddExpense> {
                     _name = value ??= "";
                   },
                 ),
-                // TextFormField(
-                //   decoration: InputDecoration(labelText: "Date"),
-                //   keyboardType: TextInputType.datetime,
-                //   onSaved: (String value) {
-                //     _date = DateTime.parse(value);
-                //   },
-                // ),
+                TextFormField(
+                  decoration: InputDecoration(hintText: "${_date.day}/${_date.month}/${_date.year}"),
+                  onTap: () => pickDate(context),
+                ),
                 const SizedBox(height: 10),
                 ElevatedButton(
-                  style: ElevatedButton.styleFrom(primary: Colors.purple),
+                  style: ElevatedButton.styleFrom(primary: Colors.cyan),
                   child: const Text(
                     'Confirm',
                     style: TextStyle(color: Colors.white),
                   ),
                   onPressed: () {
                     if (!(_formKey.currentState!).validate()) {
-                      print("error");
                       return;
                     }
-                    print("success");
-                    print("payer is ${widget.payer}");
-
                     (_formKey.currentState!).save();
+                    Map<String, int> shares = <String, int>{};
+                    for (String person in widget.currentGroup.members) {
+                      shares[person] = 1;
+                    }
+                    widget.currentGroup.addExpense(_name, _date, widget.payer, _amount, shares);
+                    Navigator.popUntil(context, ModalRoute.withName('/'));
                   },
                 ),
               ],

@@ -50,7 +50,7 @@ class _AddPersonToGroupState extends State<AddPersonToGroup> {
             ),
             const SizedBox(height: 20),
             ElevatedButton(
-              style: ElevatedButton.styleFrom(primary: Colors.purple),
+              style: ElevatedButton.styleFrom(primary: Colors.cyan),
               child: const Text(
                 'Add and return to home',
                 style: TextStyle(color: Colors.white),

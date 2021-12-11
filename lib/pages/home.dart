@@ -4,6 +4,7 @@ import 'package:chitisplit/pages/settings.dart';
 import 'package:flutter/material.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:chitisplit/classes/group.dart';
+import 'package:currency_text_input_formatter/currency_text_input_formatter.dart';
 
 class Home extends StatefulWidget {
   const Home({Key? key}) : super(key: key);
@@ -60,6 +61,19 @@ class GroupOverview extends StatefulWidget {
 }
 
 class _GroupOverviewState extends State<GroupOverview> {
+
+  final CurrencyTextInputFormatter _formatter = CurrencyTextInputFormatter(
+    symbol: '€ ',
+  );
+
+  DataRow _buildPersonalBalanceRow() {
+    double balance = widget.currentGroup.personalBalance(widget.currentGroup.currentUser);
+    return DataRow(cells: [
+      DataCell(Text(balance > 0 ? "You are owed:" : "You owe")),
+      DataCell(Text(_formatter.format(balance.abs().toStringAsFixed(2)))),
+    ]);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -75,23 +89,17 @@ class _GroupOverviewState extends State<GroupOverview> {
           rows: [
             DataRow(cells: [
               const DataCell(Text("This event cost the group:")),
-              DataCell(Text("€${widget.currentGroup.totalGroupExpenses()}")),
+              DataCell(Text(_formatter.format(widget.currentGroup.totalGroupExpenses().toStringAsFixed(2)))),
             ]),
             DataRow(cells: [
               const DataCell(Text("It cost you:")),
-              DataCell(Text(
-                  "€${widget.currentGroup.totalExpenses(widget.currentGroup.currentUser)}")),
+              DataCell(Text(_formatter.format(widget.currentGroup.totalExpenses(widget.currentGroup.currentUser).toStringAsFixed(2)))),
             ]),
             DataRow(cells: [
               const DataCell(Text("You have paid:")),
-              DataCell(Text(
-                  "€${widget.currentGroup.totalPayments(widget.currentGroup.currentUser)}")),
+              DataCell(Text(_formatter.format(widget.currentGroup.totalPayments(widget.currentGroup.currentUser).toStringAsFixed(2)))),
             ]),
-            DataRow(cells: [
-              const DataCell(Text("You owe:")),
-              DataCell(Text(
-                  "€${widget.currentGroup.personalBalance(widget.currentGroup.currentUser)}")),
-            ]),
+            _buildPersonalBalanceRow(),
           ],
         ),
       ],
