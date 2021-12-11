@@ -1,16 +1,41 @@
-# chitisplit
+# Chi Ti Split app
 
-A new Flutter application.
+![](assets/icon/icon.png)
 
-## Getting Started
+This project to help manage and split expenses between friends. The application is developed using
+Flutter, and can be made available as phone or web application.
 
-This project is a starting point for a Flutter application.
+### Build app for Android
 
-A few resources to get you started if this is your first Flutter project:
+For building the app and creating APK releases for Android, go to the project root and run
+```
+flutter build apk --split-per-abi
+```
+This procuced three APK files and stores them in `./build/app/outputs/apk/release`. In order to
+create a fat APK, remove the `--split-per-abi` flag. The right APK for a 64bit device is
+`app-arm64-v8a-release.apk`.
 
-- [Lab: Write your first Flutter app](https://flutter.dev/docs/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://flutter.dev/docs/cookbook)
+See [Build and release an Android app](https://flutter.dev/docs/deployment/android) for further
+details.
 
-For help getting started with Flutter, view our
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+### Build web app
+
+For building the app for a web version release, go to the project root and run
+```
+flutter build web
+```
+This generates all the necessary files in `./build/web`. To test locally, launch a web server.
+For example, navigate to `./build/web` and run `python -m http.server 8080`, which makes the web
+version available under `localhost:8080`.
+
+See [Build and release a web app](https://flutter.dev/docs/deployment/web) for further
+details.
+
+### Deploy to Firebase
+
+The web app is hosted using Firebase hosting. To update it, run
+```bash
+firebase deploy --only hosting
+```
+The app will then be available at [https://chi-ti-split.web.app](https://chi-ti-split.web.app) or
+[https://chi-ti-split.firebaseapp.com](https://chi-ti-split.firebaseapp.com)
