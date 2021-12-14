@@ -3,11 +3,12 @@ import 'package:chitisplit/classes/group.dart';
 import 'package:flutter/services.dart';
 import 'package:currency_text_input_formatter/currency_text_input_formatter.dart';
 
+// ignore: must_be_immutable
 class AddExpense extends StatefulWidget {
   final Group currentGroup;
   String payer;
 
-  AddExpense(this.currentGroup) : payer = currentGroup.currentUser;
+  AddExpense(this.currentGroup, {Key? key}) : payer = currentGroup.currentUser, super(key: key);
 
   @override
   _AddExpenseState createState() => _AddExpenseState();

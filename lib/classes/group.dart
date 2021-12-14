@@ -111,6 +111,10 @@ class Group {
     }
     return tot.toDouble().toInt()/100;
   }
+
+  List<Transaction> allTransactions() {
+    return transactions;
+  }
 }
 
 class Transaction {

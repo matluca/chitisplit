@@ -3,16 +3,17 @@ import 'package:chitisplit/classes/group.dart';
 import 'package:flutter/services.dart';
 import 'package:currency_text_input_formatter/currency_text_input_formatter.dart';
 
+// ignore: must_be_immutable
 class AddTransfer extends StatefulWidget {
   final Group currentGroup;
   String payer;
   String receiver;
 
-  AddTransfer(this.currentGroup)
+  AddTransfer(this.currentGroup, {Key? key})
       : payer = currentGroup.currentUser,
         receiver = (currentGroup.members[0] == currentGroup.currentUser)
             ? currentGroup.members[1]
-            : currentGroup.members[0];
+            : currentGroup.members[0], super(key: key);
 
   @override
   _AddTransferState createState() => _AddTransferState();

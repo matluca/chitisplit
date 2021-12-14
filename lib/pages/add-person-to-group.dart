@@ -4,7 +4,7 @@ import 'package:chitisplit/classes/group.dart';
 @immutable
 class AddPersonToGroup extends StatefulWidget {
   final Group currentGroup;
-  const AddPersonToGroup(this.currentGroup);
+  const AddPersonToGroup(this.currentGroup, {Key? key}): super(key: key);
   @override
   _AddPersonToGroupState createState() => _AddPersonToGroupState();
 }
@@ -43,7 +43,7 @@ class _AddPersonToGroupState extends State<AddPersonToGroup> {
               decoration: InputDecoration(
                 fillColor: Colors.white,
                 filled: true,
-                border: OutlineInputBorder(),
+                border: const OutlineInputBorder(),
                 hintText: "Maccio Capatonda",
                 errorText: _userError,
               ),

@@ -3,7 +3,7 @@ import 'package:chitisplit/classes/group.dart';
 
 class Settings extends StatefulWidget {
   final Group currentGroup;
-  const Settings(this.currentGroup);
+  const Settings(this.currentGroup, {Key? key}): super(key: key);
   @override
   _SettingsState createState() => _SettingsState();
 }
