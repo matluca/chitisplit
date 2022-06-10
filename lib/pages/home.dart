@@ -2,7 +2,9 @@ import 'package:chitisplit/pages/add-expense.dart';
 import 'package:chitisplit/pages/add-transfer.dart';
 import 'package:chitisplit/pages/add-person-to-group.dart';
 import 'package:chitisplit/pages/settings.dart';
+import 'package:chitisplit/pages/loading.dart';
 import 'package:chitisplit/pages/view-expenses.dart';
+import 'package:chitisplit/services/database.dart';
 import 'package:flutter/material.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:chitisplit/classes/group.dart';
@@ -17,38 +19,60 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Chi Ti Split'),
-        centerTitle: true,
-        actions: <Widget>[
-          IconButton(
-            icon: const Icon(Icons.settings, color: Colors.white),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => Settings(group)),
-              ).then((value) => setState(() {}));
-            },
-          ),
-        ],
-      ),
-      backgroundColor: Colors.blueAccent,
-      body: SingleChildScrollView(
-          child: Center(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 50, horizontal: 10),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              GroupOverview(group),
-              const SizedBox(height: 20),
-              Menu(setState, group),
-            ],
-          ),
-        ),
-      )),
+    return StreamBuilder(
+      stream: DatabaseService().groupList(),
+      builder: (context, snapshot) {
+        if (snapshot.hasData) {
+          List<String> groups = snapshot.data as List<String>;
+          return StreamBuilder(
+              stream: DatabaseService().members('Gruppo1'),
+              builder: (context, snapshot) {
+                if (snapshot.hasData) {
+                  List<String> members = snapshot.data as List<String>;
+                  return Scaffold(
+                    appBar: AppBar(
+                      title: const Text('Chi Ti Split'),
+                      centerTitle: true,
+                      actions: <Widget>[
+                        IconButton(
+                          icon: const Icon(Icons.settings, color: Colors.white),
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => Settings(group)),
+                            ).then((value) => setState(() {}));
+                          },
+                        ),
+                      ],
+                    ),
+                    backgroundColor: Colors.blueAccent,
+                    body: SingleChildScrollView(
+                        child: Center(
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 50, horizontal: 10),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Text(groups[0]),
+                                Text(members.toString()),
+                                GroupOverview(group),
+                                const SizedBox(height: 20),
+                                Menu(setState, group),
+                              ],
+                            ),
+                          ),
+                        )),
+                  );
+                } else {
+                  return const Loading();
+                }
+              }
+          );
+        } else {
+          return const Loading();
+        }
+      }
     );
   }
 }
