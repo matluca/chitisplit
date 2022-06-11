@@ -3,6 +3,8 @@ import 'package:fraction/fraction.dart';
 import 'package:currency_text_input_formatter/currency_text_input_formatter.dart';
 import 'package:chitisplit/classes/group.dart';
 
+import '../utils.dart';
+
 class ViewExpenses extends StatefulWidget {
   final Group currentGroup;
 
@@ -15,37 +17,41 @@ class ViewExpenses extends StatefulWidget {
 class _ViewExpensesState extends State<ViewExpenses> {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Group expenses'),
-        centerTitle: true,
-        actions: <Widget>[
-          IconButton(
-            icon: const Icon(Icons.home, color: Colors.white),
-            onPressed: () {
-              Navigator.popUntil(context, ModalRoute.withName('/'));
-            },
-          ),
-        ],
-      ),
-      backgroundColor: Colors.blueAccent,
-      body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 40),
-        child: ListView.builder(
-            physics: const NeverScrollableScrollPhysics(),
-            shrinkWrap: true,
-            itemCount: widget.currentGroup.allTransactions().length,
-            itemBuilder: (context, index) {
-              return Card(
-                child: ListTile(
-                  title: Text(getExpenseInfo(widget.currentGroup.allTransactions()[index])),
-                  onTap: () {},
+    return futurify<List<Transaction>>(widget.currentGroup.transactions(),
+        (context, snapshot, allTransactions) {
+          return Scaffold(
+            appBar: AppBar(
+              title: const Text('Group expenses'),
+              centerTitle: true,
+              actions: <Widget>[
+                IconButton(
+                  icon: const Icon(Icons.home, color: Colors.white),
+                  onPressed: () {
+                    Navigator.popUntil(context, ModalRoute.withName('/'));
+                  },
                 ),
-              );
-            },
-        ),
-      ),
-    );
+              ],
+            ),
+            backgroundColor: Colors.blueAccent,
+            body: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 40),
+              child: ListView.builder(
+                physics: const NeverScrollableScrollPhysics(),
+                shrinkWrap: true,
+                itemCount: allTransactions
+                    .length,
+                itemBuilder: (context, index) {
+                  return Card(
+                    child: ListTile(
+                      title: Text(getExpenseInfo(allTransactions[index])),
+                      onTap: () {},
+                    ),
+                  );
+                },
+              ),
+            ),
+          );
+        });
   }
 }
 

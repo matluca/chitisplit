@@ -1,3 +1,4 @@
+import 'package:chitisplit/services/database.dart';
 import 'package:flutter/material.dart';
 import 'package:chitisplit/classes/group.dart';
 
@@ -55,9 +56,9 @@ class _AddPersonToGroupState extends State<AddPersonToGroup> {
                 'Add and return to home',
                 style: TextStyle(color: Colors.white),
               ),
-              onPressed: () {
+              onPressed: () async {
                 try {
-                  widget.currentGroup.addMember(_nameController.text);
+                  await widget.currentGroup.addMember(_nameController.text);
                   setState(() {
                     _userError = null;
                   });

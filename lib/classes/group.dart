@@ -1,3 +1,4 @@
+import 'package:chitisplit/services/database.dart';
 import 'package:fraction/fraction.dart';
 
 enum TransactionType {
@@ -5,37 +6,43 @@ enum TransactionType {
   transfer,
 }
 
-Group group = Group("Gruppo bellissimo", ["Federico", "Luca", "Stfnzblnnnnnnnnnn"], "Federico");
-
 class Group {
   String name;
   String currentUser;
-  List<String> members;
-  List<Transaction> transactions;
 
-  Group(this.name, this.members, this.currentUser): transactions=[];
+  Group(this.name, this.currentUser);
 
-  bool isMember(String name) {
+  Future<List<String>> members() async {
+    return await DatabaseService().members(name);
+  }
+
+  Future<List<Transaction>> transactions() async {
+    return await DatabaseService().transactions(name);
+  }
+
+  Future<bool> isMember(String name) async {
+    List<String> members = await DatabaseService().members(this.name);
     return members.contains(name);
   }
 
-  addMember(String name) {
+  Future addMember(String name) async {
     if (name.isEmpty) {
       throw ArgumentError("user name cannot be empty");
     }
-    if (isMember(name)) {
+    if (await isMember(name)) {
       throw ArgumentError("user already member of the group");
     }
-    members.add(name);
+    await DatabaseService().addMember(this.name, name);
   }
 
-  addTransaction(String name, DateTime date, String payer, double amount, Map<String, int> shares, TransactionType type) {
-    int finalAmount = (amount*100).toInt();
-    if (!isMember(payer)) {
+  Future addTransaction(String name, DateTime date, String payer, double amount,
+      Map<String, int> shares, TransactionType type) async {
+    int finalAmount = (amount * 100).toInt();
+    if (!(await isMember(payer))) {
       throw ArgumentError(payer + " not member of the group");
     }
     for (var entry in shares.entries) {
-      if (!isMember(entry.key)) {
+      if (!(await isMember(entry.key))) {
         throw ArgumentError(entry.key + " not member of the group");
       }
       if (entry.value < 0) {
@@ -52,68 +59,71 @@ class Group {
       Fraction fraction = Fraction(share.value, sumShares);
       trans.shares[share.key] = fraction;
     }
-    transactions.add(trans);
+    await DatabaseService().addTransaction(this.name, trans);
   }
 
-  addExpense(String name, DateTime date, String payer, double amount, Map<String, int> shares) {
-    addTransaction(name, date, payer, amount, shares, TransactionType.expense);
+  Future addExpense(String name, DateTime date, String payer, double amount,
+      Map<String, int> shares) async {
+    await addTransaction(
+        name, date, payer, amount, shares, TransactionType.expense);
   }
 
-  addTransfer(String name, DateTime date, String payer, String receiver, double amount) {
+  Future addTransfer(String name, DateTime date, String payer, String receiver,
+      double amount) async {
     if (name.isEmpty) {
       name = "Transfer " + payer + "->" + receiver;
     }
     Map<String, int> shares = <String, int>{};
     shares[receiver] = 1;
     shares[payer] = 0;
-    addTransaction(name, date, payer, amount, shares, TransactionType.transfer);
+    await addTransaction(
+        name, date, payer, amount, shares, TransactionType.transfer);
   }
 
-  double totalGroupExpenses() {
+  Future<double> totalGroupExpenses() async {
     int tot = 0;
-    for (var trans in transactions) {
+    for (var trans in await transactions()) {
       if (trans.type == TransactionType.expense) {
         tot = tot + trans.amount;
       }
     }
-    return tot/100;
+    return tot / 100;
   }
 
-  double totalPayments(String name) {
+  Future<double> totalPayments(String name) async {
     int tot = 0;
-    for (var trans in transactions) {
+    for (var trans in await transactions()) {
       if ((trans.type == TransactionType.expense) && (trans.payer == name)) {
         tot = tot + trans.amount;
       }
     }
-    return tot/100;
+    return tot / 100;
   }
 
-  double totalExpenses(String name) {
+  Future<double> totalExpenses(String name) async {
     Fraction tot = 0.toFraction();
-    for (var trans in transactions) {
-      if ((trans.type == TransactionType.expense) && (trans.shares.containsKey(name))) {
-        tot = tot + trans.amount.toFraction()*(trans.shares[name] as Fraction);
+    for (var trans in await transactions()) {
+      if ((trans.type == TransactionType.expense) &&
+          (trans.shares.containsKey(name))) {
+        tot =
+            tot + trans.amount.toFraction() * (trans.shares[name] as Fraction);
       }
     }
-    return tot.toDouble().toInt()/100;
+    return tot.toDouble().toInt() / 100;
   }
 
-  double personalBalance(String name) {
+  Future<double> personalBalance(String name) async {
     Fraction tot = 0.toFraction();
-    for (var trans in transactions) {
+    for (var trans in await transactions()) {
       if (trans.payer == name) {
         tot = tot + trans.amount.toFraction();
       }
       if (trans.shares.containsKey(name)) {
-        tot = tot - trans.amount.toFraction()*(trans.shares[name] as Fraction);
+        tot =
+            tot - trans.amount.toFraction() * (trans.shares[name] as Fraction);
       }
     }
-    return tot.toDouble().toInt()/100;
-  }
-
-  List<Transaction> allTransactions() {
-    return transactions;
+    return tot.toDouble().toInt() / 100;
   }
 }
 
@@ -125,5 +135,6 @@ class Transaction {
   Map<String, Fraction> shares;
   TransactionType type;
 
-  Transaction(this.name, this.date, this.payer, this.amount, this.type): shares=<String, Fraction>{};
+  Transaction(this.name, this.date, this.payer, this.amount, this.type)
+      : shares=<String, Fraction>{};
 }

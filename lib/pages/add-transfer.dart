@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:chitisplit/utils.dart';
 import 'package:chitisplit/classes/group.dart';
 import 'package:flutter/services.dart';
 import 'package:currency_text_input_formatter/currency_text_input_formatter.dart';
@@ -7,13 +8,11 @@ import 'package:currency_text_input_formatter/currency_text_input_formatter.dart
 class AddTransfer extends StatefulWidget {
   final Group currentGroup;
   String payer;
-  String receiver;
+  String? receiver;
 
   AddTransfer(this.currentGroup, {Key? key})
       : payer = currentGroup.currentUser,
-        receiver = (currentGroup.members[0] == currentGroup.currentUser)
-            ? currentGroup.members[1]
-            : currentGroup.members[0], super(key: key);
+        receiver = null, super(key: key);
 
   @override
   _AddTransferState createState() => _AddTransferState();
@@ -29,7 +28,7 @@ class _AddTransferState extends State<AddTransfer> {
     symbol: '€ ',
   );
 
-  Widget _buildSelectPayer() {
+  Widget _buildSelectPayer(List<String> members) {
     return DropdownButton<String>(
       value: widget.payer,
       elevation: 16,
@@ -41,14 +40,12 @@ class _AddTransferState extends State<AddTransfer> {
       onChanged: (String? newValue) {
         widget.payer = newValue ??= widget.currentGroup.currentUser;
         if (widget.receiver == widget.payer) {
-          widget.receiver = (widget.currentGroup.members[0] == widget.payer)
-              ? widget.currentGroup.members[1]
-              : widget.currentGroup.members[0];
+          widget.receiver =
+              (members[0] == widget.payer) ? members[1] : members[0];
         }
         setState(() {});
       },
-      items: widget.currentGroup.members
-          .map<DropdownMenuItem<String>>((String value) {
+      items: members.map<DropdownMenuItem<String>>((String value) {
         int l = value.length;
         String text = value;
         if (l > 15) {
@@ -62,9 +59,10 @@ class _AddTransferState extends State<AddTransfer> {
     );
   }
 
-  Widget _buildSelectReceiver() {
-    String defaultValue = widget.receiver;
-    List<String> allowedReceivers = List<String>.from(widget.currentGroup.members);
+  Widget _buildSelectReceiver(List<String> members) {
+    String defaultValue = (members[0] == widget.currentGroup.currentUser)
+        ? members[1] : members[0];
+    List<String> allowedReceivers = List<String>.from(members);
     allowedReceivers.removeWhere((element) => (element == widget.payer));
 
     return DropdownButton<String>(
@@ -79,8 +77,7 @@ class _AddTransferState extends State<AddTransfer> {
         widget.receiver = newValue ??= defaultValue;
         setState(() {});
       },
-      items: allowedReceivers
-          .map<DropdownMenuItem<String>>((String value) {
+      items: allowedReceivers.map<DropdownMenuItem<String>>((String value) {
         int l = value.length;
         String text = value;
         if (l > 15) {
@@ -112,93 +109,97 @@ class _AddTransferState extends State<AddTransfer> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Add expense'),
-        centerTitle: true,
-        actions: <Widget>[
-          IconButton(
-            icon: const Icon(Icons.home, color: Colors.white),
-            onPressed: () {
-              Navigator.popUntil(context, ModalRoute.withName('/'));
-            },
-          ),
-        ],
-      ),
-      backgroundColor: Colors.blueAccent,
-      body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-        child: Form(
-          key: _formKey,
-          child: SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                FormField(
-                  builder: (FormFieldState<dynamic> state) {
-                    return _buildSelectPayer();
-                  },
-                  onSaved: (String? value) {},
-                ),
-                FormField(
-                  builder: (FormFieldState<dynamic> state) {
-                    return _buildSelectReceiver();
-                  },
-                  onSaved: (String? value) {},
-                ),
-                TextFormField(
-                  decoration: const InputDecoration(labelText: "Amount"),
-                  keyboardType: TextInputType.number,
-                  inputFormatters: <TextInputFormatter>[_formatter],
-                  validator: (String? v) {
-                    double amount = _formatter.getUnformattedValue().toDouble();
-                    if (amount <= 0) {
-                      return "Amount should be positive";
-                    }
-                    return null;
-                  },
-                  onSaved: (String? value) {
-                    _amount = _formatter.getUnformattedValue().toDouble();
-                  },
-                ),
-                TextFormField(
-                  decoration: const InputDecoration(labelText: "Description"),
-                  maxLength: 25,
-                  onSaved: (String? value) {
-                    _name = value ??= "";
-                  },
-                ),
-                TextFormField(
-                  decoration: InputDecoration(
-                      hintText: "${_date.day}/${_date.month}/${_date.year}"),
-                  onTap: () => pickDate(context),
-                ),
-                const SizedBox(height: 10),
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(primary: Colors.cyan),
-                  child: const Text(
-                    'Confirm',
-                    style: TextStyle(color: Colors.white),
+    return futurify<List<String>>(widget.currentGroup.members(),
+        (context, snapshot, members) {
+      return Scaffold(
+        appBar: AppBar(
+          title: const Text('Add expense'),
+          centerTitle: true,
+          actions: <Widget>[
+            IconButton(
+              icon: const Icon(Icons.home, color: Colors.white),
+              onPressed: () {
+                Navigator.popUntil(context, ModalRoute.withName('/'));
+              },
+            ),
+          ],
+        ),
+        backgroundColor: Colors.blueAccent,
+        body: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+          child: Form(
+            key: _formKey,
+            child: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  FormField(
+                    builder: (FormFieldState<dynamic> state) {
+                      return _buildSelectPayer(members);
+                    },
+                    onSaved: (String? value) {},
                   ),
-                  onPressed: () {
-                    if (!(_formKey.currentState!).validate()) {
-                      return;
-                    }
-                    (_formKey.currentState!).save();
-                    Map<String, int> shares = <String, int>{};
-                    for (String person in widget.currentGroup.members) {
-                      shares[person] = 1;
-                    }
-                    widget.currentGroup.addTransfer(
-                        _name, _date, widget.payer, widget.receiver, _amount);
-                    Navigator.popUntil(context, ModalRoute.withName('/'));
-                  },
-                ),
-              ],
+                  FormField(
+                    builder: (FormFieldState<dynamic> state) {
+                      return _buildSelectReceiver(members);
+                    },
+                    onSaved: (String? value) {},
+                  ),
+                  TextFormField(
+                    decoration: const InputDecoration(labelText: "Amount"),
+                    keyboardType: TextInputType.number,
+                    inputFormatters: <TextInputFormatter>[_formatter],
+                    validator: (String? v) {
+                      double amount =
+                          _formatter.getUnformattedValue().toDouble();
+                      if (amount <= 0) {
+                        return "Amount should be positive";
+                      }
+                      return null;
+                    },
+                    onSaved: (String? value) {
+                      _amount = _formatter.getUnformattedValue().toDouble();
+                    },
+                  ),
+                  TextFormField(
+                    decoration: const InputDecoration(labelText: "Description"),
+                    maxLength: 25,
+                    onSaved: (String? value) {
+                      _name = value ??= "";
+                    },
+                  ),
+                  TextFormField(
+                    decoration: InputDecoration(
+                        hintText: "${_date.day}/${_date.month}/${_date.year}"),
+                    onTap: () => pickDate(context),
+                  ),
+                  const SizedBox(height: 10),
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(primary: Colors.cyan),
+                    child: const Text(
+                      'Confirm',
+                      style: TextStyle(color: Colors.white),
+                    ),
+                    onPressed: () async {
+                      if (!(_formKey.currentState!).validate()) {
+                        return;
+                      }
+                      (_formKey.currentState!).save();
+                      Map<String, int> shares = <String, int>{};
+                      for (String person in members) {
+                        shares[person] = 1;
+                      }
+                      await widget.currentGroup.addTransfer(
+                          _name, _date, widget.payer, widget.receiver!, _amount);
+                      Navigator.popUntil(context, ModalRoute.withName('/'));
+                    },
+                  ),
+                ],
+              ),
             ),
           ),
         ),
-      ),
-    );
+      );
+    });
   }
 }
