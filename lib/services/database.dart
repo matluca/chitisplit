@@ -6,8 +6,8 @@ class DatabaseService {
   final CollectionReference groups =
       FirebaseFirestore.instance.collection('groups');
 
-  Stream<List<String>> groupList() {
-    return groups.snapshots().map(_groupsFromSnapshot);
+  Future<List<String>> groupList() {
+    return groups.get().then(_groupsFromSnapshot);
   }
 
   List<String> _groupsFromSnapshot(QuerySnapshot snapshot) {

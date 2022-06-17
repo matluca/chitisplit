@@ -16,12 +16,13 @@ class _LoadingState extends State<Loading> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.blue[900],
-      body: const Center(
-        child: SpinKitCircle(
-          color: Colors.white,
-          size: 80.0,
+    return SizedBox(
+      width: MediaQuery.of(context).size.width,
+      height: MediaQuery.of(context).size.height,
+      child: Scaffold(
+        backgroundColor: Colors.blue[900],
+        body: const Center(
+          child: SpinKitCircle(color: Colors.white, size: 80.0),
         ),
       ),
     );

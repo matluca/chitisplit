@@ -16,12 +16,18 @@ class Home extends StatefulWidget {
   _HomeState createState() => _HomeState();
 }
 
+class HomeState {
+  Group group;
+
+  HomeState(this.group);
+}
+
 class _HomeState extends State<Home> {
-  Group group = Group('Gruppo1', 'Federico');
+  HomeState state = HomeState(Group('PROD', 'Federico'));
 
   @override
   Widget build(BuildContext context) {
-    return futurify<List<String>>(group.members(),
+    return futurify<List<String>>(state.group.members(),
         (context, snapshot, members) {
       return Scaffold(
         appBar: AppBar(
@@ -33,7 +39,7 @@ class _HomeState extends State<Home> {
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => Settings(group)),
+                  MaterialPageRoute(builder: (context) => Settings(state)),
                 ).then((value) => setState(() {}));
               },
             ),
@@ -47,9 +53,9 @@ class _HomeState extends State<Home> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                GroupOverview(group),
+                GroupOverview(state.group),
                 const SizedBox(height: 20),
-                Menu(setState, group),
+                Menu(setState, state.group),
               ],
             ),
           ),
@@ -88,7 +94,7 @@ class _GroupOverviewState extends State<GroupOverview> {
       DataRow personalBalanceRow = groupFutures[3] as DataRow;
       return Column(
         children: [
-          Text("Overview - ${widget.currentGroup.currentUser}",
+          Text("${widget.currentGroup.name} - ${widget.currentGroup.currentUser}",
               style: const TextStyle(fontSize: 25)),
           DataTable(
             headingRowHeight: 15,

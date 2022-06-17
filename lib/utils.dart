@@ -1,3 +1,4 @@
+import 'package:chitisplit/pages/loading.dart';
 import 'package:flutter/material.dart';
 
 FutureBuilder futurify<T>(
@@ -11,7 +12,7 @@ FutureBuilder futurify<T>(
         } else if (snapshot.hasError) {
           return Text(snapshot.error.toString());
         } else {
-          return const Text("fuffa");
+          return const Loading();
         }
       });
 }
