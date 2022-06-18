@@ -1,4 +1,5 @@
 import 'package:chitisplit/pages/add-expense.dart';
+import 'package:chitisplit/services/database.dart';
 import 'package:chitisplit/utils.dart';
 import 'package:chitisplit/pages/add-transfer.dart';
 import 'package:chitisplit/pages/add-person-to-group.dart';
@@ -8,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:chitisplit/classes/group.dart';
 import 'package:currency_text_input_formatter/currency_text_input_formatter.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Home extends StatefulWidget {
   const Home({Key? key}) : super(key: key);
@@ -23,44 +25,47 @@ class HomeState {
 }
 
 class _HomeState extends State<Home> {
-  HomeState state = HomeState(Group('PROD', 'Federico'));
+  HomeState? defaultState;
 
   @override
   Widget build(BuildContext context) {
-    return futurify<List<String>>(state.group.members(),
-        (context, snapshot, members) {
-      return Scaffold(
-        appBar: AppBar(
-          title: const Text('Chi Ti Split'),
-          centerTitle: true,
-          actions: <Widget>[
-            IconButton(
-              icon: const Icon(Icons.settings, color: Colors.white),
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => Settings(state)),
-                ).then((value) => setState(() {}));
-              },
-            ),
-          ],
-        ),
-        backgroundColor: Colors.blueAccent,
-        body: SingleChildScrollView(
-            child: Center(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 50, horizontal: 10),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                GroupOverview(state.group),
-                const SizedBox(height: 20),
-                Menu(setState, state.group),
-              ],
-            ),
+    return futurify<HomeState>(setDefaultsFromPreferences(defaultState),
+        (context, snapshot, state) {
+      return futurify<List<String>>(state.group.members(),
+          (context, snapshot, members) {
+        return Scaffold(
+          appBar: AppBar(
+            title: const Text('Chi Ti Split'),
+            centerTitle: true,
+            actions: <Widget>[
+              IconButton(
+                icon: const Icon(Icons.settings, color: Colors.white),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => Settings(state)),
+                  ).then((value) => setState(() {}));
+                },
+              ),
+            ],
           ),
-        )),
-      );
+          backgroundColor: Colors.blueAccent,
+          body: SingleChildScrollView(
+              child: Center(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 50, horizontal: 10),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  GroupOverview(state.group),
+                  const SizedBox(height: 20),
+                  Menu(setState, state.group),
+                ],
+              ),
+            ),
+          )),
+        );
+      });
     });
   }
 }
@@ -94,7 +99,8 @@ class _GroupOverviewState extends State<GroupOverview> {
       DataRow personalBalanceRow = groupFutures[3] as DataRow;
       return Column(
         children: [
-          Text("${widget.currentGroup.name} - ${widget.currentGroup.currentUser}",
+          Text(
+              "${widget.currentGroup.name} - ${widget.currentGroup.currentUser}",
               style: const TextStyle(fontSize: 25)),
           DataTable(
             headingRowHeight: 15,
@@ -205,4 +211,25 @@ Future<DataRow> _buildPersonalBalanceRow(Group group) async {
     DataCell(Text(balance > 0 ? "You are owed:" : "You owe")),
     DataCell(Text(_formatter.format(balance.abs().toStringAsFixed(2)))),
   ]);
+}
+
+Future<HomeState> setDefaultsFromPreferences(HomeState? state) async {
+  if (state != null) {
+    return state;
+  }
+  state = HomeState(Group('PROD', 'Federico'));
+  List<String> groups = await DatabaseService().groupList();
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  String? prefGroup = prefs.getString('group');
+  String? prefUser = prefs.getString('user');
+  if ((prefGroup != null) && groups.contains(prefGroup)) {
+    state.group.name = prefGroup;
+  }
+  List<String> members = await state.group.members();
+  if ((prefUser != null) && members.contains(prefUser)) {
+    state.group.currentUser = prefUser;
+  } else {
+    state.group.currentUser = members[0];
+  }
+  return state;
 }

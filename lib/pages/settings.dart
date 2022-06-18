@@ -3,6 +3,7 @@ import 'package:chitisplit/services/database.dart';
 import 'package:flutter/material.dart';
 import 'package:chitisplit/classes/group.dart';
 import '../utils.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 // ignore: must_be_immutable
 class Settings extends StatefulWidget {
@@ -63,6 +64,9 @@ class _SettingsState extends State<Settings> {
                           members.contains(widget.state.group.currentUser)
                               ? widget.state.group.currentUser
                               : members[0];
+                      SharedPreferences prefs = await SharedPreferences.getInstance();
+                      await prefs.setString('group', groupName);
+                      await prefs.setString('user', group.currentUser);
                       setState(() {
                         widget.state.group = group;
                       });
@@ -95,10 +99,12 @@ class _SettingsState extends State<Settings> {
                       height: 2,
                       color: Colors.black54,
                     ),
-                    onChanged: (String? newValue) {
+                    onChanged: (String? newValue) async {
+                      SharedPreferences prefs = await SharedPreferences.getInstance();
+                      String newUser = newValue ??= widget.state.group.currentUser;
+                      await prefs.setString('user', newUser);
                       setState(() {
-                        widget.state.group.currentUser =
-                            newValue ??= widget.state.group.currentUser;
+                        widget.state.group.currentUser = newUser;
                       });
                     },
                     items:
