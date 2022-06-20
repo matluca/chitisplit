@@ -11,7 +11,7 @@ For building the app and creating APK releases for Android, go to the project ro
 ```
 flutter build apk --split-per-abi
 ```
-This procuced three APK files and stores them in `./build/app/outputs/apk/release`. In order to
+This produces three APK files and stores them in `./build/app/outputs/apk/release`. In order to
 create a fat APK, remove the `--split-per-abi` flag. The right APK for a 64bit device is
 `app-arm64-v8a-release.apk`.
 
