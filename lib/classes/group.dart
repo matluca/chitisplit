@@ -80,6 +80,13 @@ class Group {
         name, date, payer, amount, shares, TransactionType.transfer);
   }
 
+  Future deleteTransaction(String? id) async {
+    if (id == null) {
+      return;
+    }
+    await DatabaseService().deleteTransaction(name, id);
+  }
+
   Future<double> totalGroupExpenses() async {
     int tot = 0;
     for (var trans in await transactions()) {
@@ -128,6 +135,7 @@ class Group {
 }
 
 class Transaction {
+  String? id;
   String name;
   DateTime date;
   String payer;

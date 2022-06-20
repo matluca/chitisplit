@@ -4,7 +4,7 @@ import 'package:chitisplit/utils.dart';
 import 'package:chitisplit/pages/add-transfer.dart';
 import 'package:chitisplit/pages/add-person-to-group.dart';
 import 'package:chitisplit/pages/settings.dart';
-import 'package:chitisplit/pages/view-expenses.dart';
+import 'package:chitisplit/pages/view_expenses.dart';
 import 'package:flutter/material.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:chitisplit/classes/group.dart';

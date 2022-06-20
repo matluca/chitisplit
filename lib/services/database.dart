@@ -36,6 +36,10 @@ class DatabaseService {
     transaction['shares'] = shares;
     return await groups.doc(groupName).collection('transactions').add(transaction);
   }
+
+  Future deleteTransaction(String groupName, String id) async {
+    return await groups.doc(groupName).collection('transactions').doc(id).delete();
+  }
   
   Future<List<String>> members(String groupName) {
     CollectionReference members = groups.doc(groupName).collection('members');
@@ -70,6 +74,7 @@ class DatabaseService {
       }
       group.Transaction transaction = group.Transaction(name, date, payer, amount, type);
       transaction.shares = shares;
+      transaction.id = doc.id;
       return transaction;
     }).toList();
   }

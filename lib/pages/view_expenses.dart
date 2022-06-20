@@ -1,3 +1,4 @@
+import 'package:chitisplit/pages/view_expense.dart';
 import 'package:flutter/material.dart';
 import 'package:fraction/fraction.dart';
 import 'package:currency_text_input_formatter/currency_text_input_formatter.dart';
@@ -44,7 +45,13 @@ class _ViewExpensesState extends State<ViewExpenses> {
                 return Card(
                   child: ListTile(
                     title: Text(getExpenseInfo(allTransactions[index])),
-                    onTap: () {},
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => ViewExpense(widget.currentGroup, allTransactions[index])),
+                      ).then((value) => setState(() {}));
+                    },
                   ),
                 );
               },
