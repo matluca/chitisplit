@@ -19,39 +19,40 @@ class _ViewExpensesState extends State<ViewExpenses> {
   Widget build(BuildContext context) {
     return futurify<List<Transaction>>(widget.currentGroup.transactions(),
         (context, snapshot, allTransactions) {
-          return Scaffold(
-            appBar: AppBar(
-              title: const Text('Group expenses'),
-              centerTitle: true,
-              actions: <Widget>[
-                IconButton(
-                  icon: const Icon(Icons.home, color: Colors.white),
-                  onPressed: () {
-                    Navigator.popUntil(context, ModalRoute.withName('/'));
-                  },
-                ),
-              ],
+      return Scaffold(
+        appBar: AppBar(
+          title: const Text('Group expenses'),
+          centerTitle: true,
+          actions: <Widget>[
+            IconButton(
+              icon: const Icon(Icons.home, color: Colors.white),
+              onPressed: () {
+                Navigator.popUntil(context, ModalRoute.withName('/'));
+              },
             ),
-            backgroundColor: Colors.blueAccent,
-            body: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 40),
-              child: ListView.builder(
-                physics: const NeverScrollableScrollPhysics(),
-                shrinkWrap: true,
-                itemCount: allTransactions
-                    .length,
-                itemBuilder: (context, index) {
-                  return Card(
-                    child: ListTile(
-                      title: Text(getExpenseInfo(allTransactions[index])),
-                      onTap: () {},
-                    ),
-                  );
-                },
-              ),
+          ],
+        ),
+        backgroundColor: Colors.blueAccent,
+        body: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 40),
+          child: SingleChildScrollView(
+            child: ListView.builder(
+              physics: const NeverScrollableScrollPhysics(),
+              shrinkWrap: true,
+              itemCount: allTransactions.length,
+              itemBuilder: (context, index) {
+                return Card(
+                  child: ListTile(
+                    title: Text(getExpenseInfo(allTransactions[index])),
+                    onTap: () {},
+                  ),
+                );
+              },
             ),
-          );
-        });
+          ),
+        ),
+      );
+    });
   }
 }
 
