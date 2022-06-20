@@ -50,7 +50,7 @@ class DatabaseService {
   
   Future<List<group.Transaction>> transactions(String groupName) {
     CollectionReference transactions = groups.doc(groupName).collection('transactions');
-    return transactions.get().then(_transactionsFromSnapshot);
+    return transactions.orderBy('date', descending: true).get().then(_transactionsFromSnapshot);
   }
 
   List<group.Transaction> _transactionsFromSnapshot(QuerySnapshot snapshot) {
