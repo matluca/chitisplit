@@ -3,6 +3,7 @@ import 'package:chitisplit/classes/group.dart';
 import 'package:chitisplit/utils.dart';
 import 'package:flutter/services.dart';
 import 'package:currency_text_input_formatter/currency_text_input_formatter.dart';
+import 'package:expandable/expandable.dart';
 
 // ignore: must_be_immutable
 class AddExpense extends StatefulWidget {
@@ -21,6 +22,7 @@ class _AddExpenseState extends State<AddExpense> {
   String _name = "";
   DateTime _date = DateTime.now();
   double _amount = 0;
+  final Map<String, int> _shares = {};
 
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final CurrencyTextInputFormatter _formatter = CurrencyTextInputFormatter(
@@ -70,10 +72,41 @@ class _AddExpenseState extends State<AddExpense> {
     });
   }
 
+  Widget _buildSharesFormFields(List<String> members) {
+    List<TextFormField> shares = [];
+    for (var member in members) {
+      TextFormField shareField = TextFormField(
+        initialValue: _shares[member].toString(),
+        decoration: InputDecoration(labelText: member),
+        keyboardType: TextInputType.number,
+        inputFormatters: <TextInputFormatter>[
+          FilteringTextInputFormatter.digitsOnly
+        ],
+        validator: (String? v) {
+          int share = (v != null) ? int.parse(v) : 0;
+          if (share < 0) {
+            return "Share can not be negative";
+          }
+          return null;
+        },
+        onSaved: (String? v) {
+          _shares[member] = (v != null) ? int.parse(v) : 0;
+        },
+      );
+      shares.add(shareField);
+    }
+    return Column(
+      children: shares,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return futurify<List<String>>(widget.currentGroup.members(),
         (context, snapshot, members) {
+      for (var member in members) {
+        _shares[member] = 1;
+      }
       return Scaffold(
         appBar: AppBar(
           title: const Text('Add expense'),
@@ -130,6 +163,13 @@ class _AddExpenseState extends State<AddExpense> {
                         hintText: "${_date.day}/${_date.month}/${_date.year}"),
                     onTap: () => pickDate(context),
                   ),
+                  const SizedBox(height: 20),
+                  ExpandablePanel(
+                    header:
+                        const Text('Shares', style: TextStyle(fontSize: 20)),
+                    collapsed: Container(),
+                    expanded: _buildSharesFormFields(members),
+                  ),
                   const SizedBox(height: 10),
                   ElevatedButton(
                     style: ElevatedButton.styleFrom(primary: Colors.cyan),
@@ -142,12 +182,8 @@ class _AddExpenseState extends State<AddExpense> {
                         return;
                       }
                       (_formKey.currentState!).save();
-                      Map<String, int> shares = <String, int>{};
-                      for (String person in members) {
-                        shares[person] = 1;
-                      }
                       await widget.currentGroup.addExpense(
-                          _name, _date, widget.payer, _amount, shares);
+                          _name, _date, widget.payer, _amount, _shares);
                       Navigator.popUntil(context, ModalRoute.withName('/'));
                     },
                   ),

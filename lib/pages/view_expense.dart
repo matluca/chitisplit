@@ -1,6 +1,7 @@
 import 'package:currency_text_input_formatter/currency_text_input_formatter.dart';
 import 'package:flutter/material.dart';
 import 'package:chitisplit/classes/group.dart';
+import 'package:fraction/fraction.dart';
 
 class ViewExpense extends StatefulWidget {
   final Group currentGroup;
@@ -71,14 +72,13 @@ Column expenseDetails(Transaction transaction) {
     Text('Type: ' + transaction.type.name, style: myStyle),
     Text('Shares: ', style: myStyle),
   ];
-  for (var sharesEntry in transaction.shares.entries) {
-    if (sharesEntry.value.numerator != 0) {
-      int amount = (sharesEntry.value.toDouble() * transaction.amount).round();
+  var sortedMembers = transaction.shares.keys.toList()..sort();
+  for (var member in sortedMembers) {
+    Fraction share = transaction.shares[member]!;
+    if (share.numerator != 0) {
+      int amount = (share.toDouble() * transaction.amount).round();
       details.add(Text(
-          '\t\t\t' +
-              sharesEntry.key +
-              ': ' +
-              _formatter.format(amount.toString()),
+          '\t\t\t' + member + ': ' + _formatter.format(amount.toString()),
           style: myStyle));
     }
   }
