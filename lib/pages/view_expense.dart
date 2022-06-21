@@ -42,10 +42,14 @@ class _ViewExpenseState extends State<ViewExpense> {
               'Delete',
               style: TextStyle(color: Colors.white),
             ),
-            onPressed: () async {
-              //TODO ask for confirmation before deleting
-              await widget.currentGroup.deleteTransaction(widget.transaction.id);
-              Navigator.pop(context);
+            onPressed: () {
+              showDialog(
+                context: context,
+                builder: (BuildContext context) {
+                  return confirmationDialog(
+                      context, widget.currentGroup, widget.transaction.id);
+                },
+              );
             },
           ),
         ])),
@@ -89,3 +93,26 @@ String formatDate(DateTime date) {
 TextStyle myStyle = const TextStyle(
   fontSize: 25,
 );
+
+AlertDialog confirmationDialog(
+    BuildContext context, Group group, String? transactionId) {
+  return AlertDialog(
+    content: const Text("Are you sure you want to delete this transaction?"),
+    actions: [
+      TextButton(
+        child: const Text("Cancel"),
+        onPressed: () {
+          Navigator.pop(context);
+        },
+      ),
+      TextButton(
+        child: const Text("OK"),
+        onPressed: () async {
+          await group.deleteTransaction(transactionId);
+          Navigator.pop(context);
+          Navigator.pop(context);
+        },
+      ),
+    ],
+  );
+}
