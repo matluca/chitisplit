@@ -23,6 +23,7 @@ class _AddExpenseState extends State<AddExpense> {
   DateTime _date = DateTime.now();
   double _amount = 0;
   final Map<String, int> _shares = {};
+  int _sumShares = 0;
 
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final CurrencyTextInputFormatter _formatter = CurrencyTextInputFormatter(
@@ -73,7 +74,7 @@ class _AddExpenseState extends State<AddExpense> {
   }
 
   Widget _buildSharesFormFields(List<String> members) {
-    List<TextFormField> shares = [];
+    List<Row> shareRows = [];
     for (var member in members) {
       TextFormField shareField = TextFormField(
         initialValue: _shares[member].toString(),
@@ -89,14 +90,32 @@ class _AddExpenseState extends State<AddExpense> {
           }
           return null;
         },
+        onChanged: (String? v) {
+          _shares[member] = (v != null) ? int.parse(v) : 0;
+          _sumShares = 0;
+          for (var x in _shares.values) {
+            _sumShares += x;
+          }
+          setState(() {});
+        },
         onSaved: (String? v) {
           _shares[member] = (v != null) ? int.parse(v) : 0;
+          _sumShares = 0;
+          for (var x in _shares.values) {
+            _sumShares += x;
+          }
+          setState(() {});
         },
       );
-      shares.add(shareField);
+      Row shareRow = Row(children: [
+        SizedBox(
+            width: MediaQuery.of(context).size.width * 0.7, child: shareField),
+        Text(' / $_sumShares'),
+      ]);
+      shareRows.add(shareRow);
     }
     return Column(
-      children: shares,
+      children: shareRows,
     );
   }
 
@@ -104,8 +123,12 @@ class _AddExpenseState extends State<AddExpense> {
   Widget build(BuildContext context) {
     return futurify<List<String>>(widget.currentGroup.members(),
         (context, snapshot, members) {
-      for (var member in members) {
-        _shares[member] = 1;
+      if (_shares.isEmpty) {
+        _sumShares = 0;
+        for (var member in members) {
+          _shares[member] = 1;
+          _sumShares++;
+        }
       }
       return Scaffold(
         appBar: AppBar(
